@@ -4,19 +4,19 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
 
 // Estendendo o tipo Session para incluir token e outros dados do usuário
-declare module "next-auth" {
-  interface Session {
-    user: {
-      token?: string;
-      refreshToken?: string;
-      profilePicture?: string;
-      id?: string;
-      [key: string]: any;
-    } & DefaultSession["user"];
+  declare module "next-auth" {
+    interface Session {
+      user: {
+        token?: string;
+        refreshToken?: string;
+        profilePicture?: string;
+        id?: string;
+        [key: string]: any;
+      } & DefaultSession["user"];
+    }
   }
-}
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/",
   },
