@@ -48,7 +48,7 @@ const AccountPage = () => {
         setUserTrails(myTrails); // Armazena as trilhas do usuário no estado
         
         // Calcular distância total e número de trilhas
-        const totalDistance = myTrails.reduce((acc, trail) => acc + trail.distance, 0);
+        const totalDistance = myTrails.reduce((acc: any, trail: any) => acc + trail.distance, 0);
         setTotalDistance(totalDistance);
         setTrailsVisited(myTrails.length); // Atualiza o número de trilhas visitadas
       } catch (error) {
