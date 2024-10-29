@@ -6,7 +6,11 @@ import { Trail } from "../../../interfaces/Trails"
 
 export async function GET() {
   try {
-    const session = await getServerSession();
+    let session: any = null;
+    setTimeout(() => {
+      session = getServerSession();
+    }, 1000)
+    
 
     if (!session || !session.user || !session.user.token) {
       console.log("Sessão não encontrada ou token ausente");

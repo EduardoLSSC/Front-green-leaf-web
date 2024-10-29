@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import GetDotenvVariable from "@/config/dotenfconfig";
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
-
     const body = await request.json();
 
     // Validações básicas podem ser feitas aqui
