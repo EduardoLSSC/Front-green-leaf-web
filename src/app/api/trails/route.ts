@@ -7,9 +7,7 @@ import { Trail } from "../../../interfaces/Trails";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions); // Passando authOptions para garantir que a sessão seja carregada corretamente
-    
-    console.log("Sessão dentro da rota /api/trails:", session); // Para verificar se o token está presente
-    
+        
     if (!session || !session.user || !session.user.token) {
       console.log("Sessão não encontrada ou token ausente");
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

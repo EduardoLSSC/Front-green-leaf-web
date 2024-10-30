@@ -65,7 +65,6 @@ export const authOptions: NextAuthOptions = {
         token.profilePicture = user.profilePicture; // Pega a imagem de perfil
         token.id = user.id; // Adiciona o ID do usuário ao token
       }
-      console.log("JWT callback - token:", token);
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
@@ -74,11 +73,10 @@ export const authOptions: NextAuthOptions = {
       session.user.profilePicture = token.profilePicture as string | undefined;
       session.user.id = token.id as string | undefined;
       
-      console.log("Session callback - session:", session);
       return session;
     },
   },
-  debug: true, // Ativa logs de depuração para ajudar a identificar problemas de autenticação
+  debug: false,
 };
 
 const handler = NextAuth(authOptions);
