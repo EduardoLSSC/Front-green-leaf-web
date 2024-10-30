@@ -3,20 +3,20 @@ import NextAuth, { NextAuthOptions, Session, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
 
-// Estendendo o tipo Session para incluir token e outros dados do usuário
-  declare module "next-auth" {
-    interface Session {
-      user: {
-        token?: string;
-        refreshToken?: string;
-        profilePicture?: string;
-        id?: string;
-        [key: string]: any;
-      } & DefaultSession["user"];
-    }
+// Extensão do tipo Session para incluir token e outros dados do usuário
+declare module "next-auth" {
+  interface Session {
+    user: {
+      token?: string;
+      refreshToken?: string;
+      profilePicture?: string;
+      id?: string;
+      [key: string]: any;
+    } & DefaultSession["user"];
   }
+}
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/",
   },
@@ -44,12 +44,15 @@ const authOptions: NextAuthOptions = {
         const user = await res.json();
 
         if (res.ok && user) {
+          console.log("Login bem-sucedido:", user);
           return {
             ...user,
             id: user.id,
+            tokens: user.tokens, // certifique-se de que 'tokens' existe na resposta do login
           };
         }
 
+        console.log("Falha no login:", res.statusText);
         return null;
       },
     }),
@@ -62,23 +65,20 @@ const authOptions: NextAuthOptions = {
         token.profilePicture = user.profilePicture; // Pega a imagem de perfil
         token.id = user.id; // Adiciona o ID do usuário ao token
       }
+      console.log("JWT callback - token:", token);
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: Session;
-      token: JWT;
-    }): Promise<Session> {
+    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
       session.user.token = token.token as string | undefined;
       session.user.refreshToken = token.refreshToken as string | undefined;
       session.user.profilePicture = token.profilePicture as string | undefined;
-      session.user.id = token.id as string | undefined; // Adiciona o ID à sessão
-
+      session.user.id = token.id as string | undefined;
+      
+      console.log("Session callback - session:", session);
       return session;
     },
   },
+  debug: true, // Ativa logs de depuração para ajudar a identificar problemas de autenticação
 };
 
 const handler = NextAuth(authOptions);
