@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import GetDotenvVariable from "@/config/dotenfconfig";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route"
+import { authOptions } from "../auth/authOptions"
 import { Trail } from "../../../interfaces/Trails";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions); // Passando authOptions para garantir que a sessão seja carregada corretamente
+    const session = await getServerSession(authOptions);
         
     if (!session || !session.user || !session.user.token) {
       console.log("Sessão não encontrada ou token ausente");
