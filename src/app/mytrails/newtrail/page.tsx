@@ -8,7 +8,6 @@ import { faPlay, faPause, faStop, faMapMarkerAlt, faTimes } from '@fortawesome/f
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css';
 import { useMap } from 'react-leaflet';
-// import 'leaflet.locatecontrol';
 
 // Import react-leaflet components dynamically for client-side only
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -34,24 +33,32 @@ if (typeof window !== 'undefined') {
 
 type Position = [number, number];
 
-// LocateControl component with `useMap` usage without dynamic
+// LocateControl component with `useMap` usage and dynamic import for leaflet.locatecontrol
 const LocateControl = () => {
   const map = useMap();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const L = require('leaflet');
-      const locateControl = L.control.locate({
-        position: 'topright',
-        flyTo: true,
-        showPopup: false,
-        strings: { title: "Voltar para a localização atual" },
-        locateOptions: { enableHighAccuracy: true },
-      }).addTo(map);
 
-      return () => {
-        locateControl.remove();
-      };
+      // Carrega o controle de localização dinamicamente no lado do cliente
+      import('leaflet.locatecontrol').then(() => {
+        if (L.control?.locate) {
+          const locateControl = L.control.locate({
+            position: 'topright',
+            flyTo: true,
+            showPopup: false,
+            strings: { title: "Voltar para a localização atual" },
+            locateOptions: { enableHighAccuracy: true },
+          }).addTo(map);
+
+          return () => {
+            locateControl.remove();
+          };
+        }
+      }).catch(error => {
+        console.error("Erro ao carregar o leaflet.locatecontrol:", error);
+      });
     }
   }, [map]);
 
