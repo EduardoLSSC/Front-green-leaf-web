@@ -6,8 +6,10 @@ import dynamic from 'next/dynamic';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faStop, faMapMarkerAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css';
-import { useMap } from 'react-leaflet';
+
+import LocateControl from './components/LocateControl';
+import DefaultIcon from './components/DefaultIcon';
+import calculateDistance from './utils/calculateDistance';
 
 // Import react-leaflet components dynamically for client-side only
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -18,65 +20,7 @@ const LayersControl = dynamic(() => import('react-leaflet').then(mod => mod.Laye
 const BaseLayer = dynamic(() => import('react-leaflet').then(mod => mod.LayersControl.BaseLayer), { ssr: false });
 const ZoomControl = dynamic(() => import('react-leaflet').then(mod => mod.ZoomControl), { ssr: false });
 
-// Define DefaultIcon only on the client side
-let DefaultIcon;
-if (typeof window !== 'undefined') {
-  const L = require('leaflet');
-  DefaultIcon = L.icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-  });
-}
-
 type Position = [number, number];
-
-// LocateControl component with `useMap` usage and dynamic import for leaflet.locatecontrol
-const LocateControl = () => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const L = require('leaflet');
-
-      // Carrega o controle de localização dinamicamente no lado do cliente
-      import('leaflet.locatecontrol').then(() => {
-        if (L.control?.locate) {
-          const locateControl = L.control.locate({
-            position: 'topright',
-            flyTo: true,
-            showPopup: false,
-            strings: { title: "Voltar para a localização atual" },
-            locateOptions: { enableHighAccuracy: true },
-          }).addTo(map);
-
-          return () => {
-            locateControl.remove();
-          };
-        }
-      }).catch(error => {
-        console.error("Erro ao carregar o leaflet.locatecontrol:", error);
-      });
-    }
-  }, [map]);
-
-  return null;
-};
-
-const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const R = 6371e3;
-  const φ1 = lat1 * (Math.PI / 180);
-  const φ2 = lat2 * (Math.PI / 180);
-  const Δφ = (lat2 - lat1) * (Math.PI / 180);
-  const Δλ = (lon2 - lon1) * (Math.PI / 180);
-
-  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-            Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
 
 const AddTrailPage = () => {
   const { data: session } = useSession();
@@ -220,7 +164,7 @@ const AddTrailPage = () => {
               <TileLayer url="https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}" />
             </BaseLayer>
           </LayersControl>
-          <Marker position={position}>
+          <Marker position={position} icon={DefaultIcon || undefined}>
             <Popup>Você está aqui</Popup>
           </Marker>
           <LocateControl />
