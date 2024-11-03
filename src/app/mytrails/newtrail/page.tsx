@@ -27,7 +27,7 @@ const AddTrailPage = () => {
   const user = session?.user;
 
   const [position, setPosition] = useState<Position | null>(null);
-  const [previousPosition, setPreviousPosition] = useState<Position | null>(null);
+  const [path, setPath] = useState<Position[]>([]);
   const [isTracking, setIsTracking] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
@@ -37,6 +37,7 @@ const AddTrailPage = () => {
     difficulty: '',
     description: '',
     photo: '',
+    location: '',
   });
 
   const [elapsedTime, setElapsedTime] = useState<number>(0);
@@ -63,24 +64,29 @@ const AddTrailPage = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
 
-          if (previousPosition) {
-            const distance = calculateDistance(
-              previousPosition[0],
-              previousPosition[1],
-              latitude,
-              longitude
-            );
-            setTotalDistance(prevDistance => prevDistance + distance);
-            setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
-
-            if (totalDistance > 0) {
-              setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
-            } else {
-              setAveragePace('0:00');
-            }
+          if (isTracking && !isPaused) {
+            const newPoint: Position = [latitude, longitude];
+            setPath((prevPath) => {
+              if (prevPath.length > 0) {
+                const lastPoint = prevPath[prevPath.length - 1];
+                const distance = calculateDistance(
+                  lastPoint[0],
+                  lastPoint[1],
+                  latitude,
+                  longitude
+                );
+                setTotalDistance((prevDistance) => prevDistance + distance);
+                setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
+                if (totalDistance > 0) {
+                  setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
+                } else {
+                  setAveragePace('0:00');
+                }
+              }
+              return [...prevPath, newPoint];
+            });
           }
 
-          setPreviousPosition([latitude, longitude]);
           setPosition([latitude, longitude]);
         },
         (error) => console.error("Erro ao obter a localização:", error),
@@ -89,13 +95,13 @@ const AddTrailPage = () => {
 
       return () => navigator.geolocation.clearWatch(watchId);
     }
-  }, [previousPosition, elapsedTime, totalDistance]);
+  }, [isTracking, isPaused, totalDistance, elapsedTime]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       let timer: NodeJS.Timeout;
       if (isTracking && !isPaused) {
-        timer = setInterval(() => setElapsedTime(prev => prev + 1), 1000);
+        timer = setInterval(() => setElapsedTime((prev) => prev + 1), 1000);
       }
       return () => clearInterval(timer);
     }
@@ -121,9 +127,42 @@ const AddTrailPage = () => {
     setIsTracking(false);
     setElapsedTime(0);
     setTotalDistance(0);
+    setPath([]);
     setAverageSpeed(0);
     setIsMapVisible(true);
     setIsFormVisible(false);
+    localStorage.removeItem('trailPath');
+  };
+
+  const handleSave = async () => {
+    const trailToSave = {
+      ...trailData,
+      distance: totalDistance,
+      createdById: user?.id || null,
+      path: {
+        type: "LineString",
+        coordinates: path,
+      },
+    };
+
+    try {
+      const response = await fetch('/api/trails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.user?.token}`,
+        },
+        body: JSON.stringify(trailToSave),
+      });
+
+      if (response.ok) {
+        console.log('Trail saved successfully');
+      } else {
+        console.error('Failed to save trail:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error saving trail:', error);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -159,9 +198,6 @@ const AddTrailPage = () => {
           <LayersControl position="topright">
             <BaseLayer checked name="OpenStreetMap">
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            </BaseLayer>
-            <BaseLayer name="Mapbox">
-              <TileLayer url="https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}" />
             </BaseLayer>
           </LayersControl>
           <Marker position={position} icon={DefaultIcon || undefined}>
@@ -212,7 +248,7 @@ const AddTrailPage = () => {
             </div>
           </>
         ) : (
-          <form className="bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-lg">
+          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-lg">
             <div className="mb-4">
               <label htmlFor="name" className="block text-lg font-medium">Nome da Atividade</label>
               <input
@@ -225,7 +261,18 @@ const AddTrailPage = () => {
                 className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
               />
             </div>
-
+            <div className="mb-4">
+              <label htmlFor="location" className="block text-lg font-medium">Localização</label>
+              <input
+                type="text"
+                name="location"
+                id="location"
+                value={trailData.location}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
+              />
+            </div>
             <div className="mb-4">
               <label htmlFor="description" className="block text-lg font-medium">Como foi?</label>
               <textarea
@@ -237,7 +284,6 @@ const AddTrailPage = () => {
                 className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
               />
             </div>
-
             <div className="mb-4">
               <label htmlFor="difficulty" className="block text-lg font-medium">Dificuldade</label>
               <select
@@ -249,12 +295,11 @@ const AddTrailPage = () => {
                 className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
               >
                 <option value="">Selecione a dificuldade</option>
-                <option value="fácil">Fácil</option>
-                <option value="moderada">Moderada</option>
-                <option value="difícil">Difícil</option>
+                <option value="Fácil">Fácil</option>
+                <option value="Médio">Médio</option>
+                <option value="Difícil">Difícil</option>
               </select>
             </div>
-
             <div className="mb-4">
               <label htmlFor="photo" className="block text-lg font-medium">Adicionar Fotos/Vídeos</label>
               <input
@@ -267,7 +312,6 @@ const AddTrailPage = () => {
                 <img src={trailData.photo} alt="Preview" className="mt-2 w-full h-auto rounded" />
               )}
             </div>
-
             <div className="flex justify-between mt-6">
               <button type="button" onClick={handleDiscard} className="bg-red-600 text-white p-3 rounded-full w-1/2 mr-2 hover:bg-red-700">
                 Descartar Atividade
