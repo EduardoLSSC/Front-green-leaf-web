@@ -65,39 +65,55 @@ const AddTrailPage = () => {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-
+          const newPoint: Position = [latitude, longitude];
+  
           if (isTracking && !isPaused) {
-            const newPoint: Position = [latitude, longitude];
             setPath((prevPath) => {
-              if (prevPath.length > 0) {
-                const lastPoint = prevPath[prevPath.length - 1];
-                const distance = calculateDistance(
-                  lastPoint[0],
-                  lastPoint[1],
-                  latitude,
-                  longitude
-                );
+              // Always add the first point if the path is empty
+              if (prevPath.length === 0) {
+                console.log('Adding the first point:', newPoint);
+                return [newPoint];
+              }
+  
+              // Check the distance to the last point for subsequent points
+              const lastPoint = prevPath[prevPath.length - 1];
+              const distance = calculateDistance(
+                lastPoint[0],
+                lastPoint[1],
+                latitude,
+                longitude
+              );
+  
+              // Add the new point only if it is significantly different (e.g., > 5 meters)
+              if (distance > 0.005) { // Adjust this threshold as needed
+                console.log('Adding new point:', newPoint);
                 setTotalDistance((prevDistance) => prevDistance + distance);
                 setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
+                
                 if (totalDistance > 0) {
                   setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
                 } else {
                   setAveragePace('0:00');
                 }
+  
+                return [...prevPath, newPoint];
+              } else {
+                console.log('Point too close to the last one, skipping.');
+                return prevPath;
               }
-              return [...prevPath, newPoint];
             });
           }
-
-          setPosition([latitude, longitude]);
+  
+          setPosition(newPoint);
         },
         (error) => console.error("Erro ao obter a localização:", error),
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
       );
-
+  
       return () => navigator.geolocation.clearWatch(watchId);
     }
   }, [isTracking, isPaused, totalDistance, elapsedTime]);
+    
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -137,6 +153,13 @@ const AddTrailPage = () => {
   };
 
   const handleSave = async () => {
+    // Ensure the path contains at least two distinct points
+    if (path.length < 2) {
+      console.error('Invalid path: A LINESTRING must have at least two distinct points.');
+      alert('Erro: O caminho precisa ter pelo menos dois pontos distintos.');
+      return;
+    }
+  
     const trailToSave = {
       ...trailData,
       distance: totalDistance,
@@ -146,7 +169,7 @@ const AddTrailPage = () => {
         coordinates: path,
       },
     };
-
+  
     try {
       const response = await fetch('/api/trails', {
         method: 'POST',
@@ -156,7 +179,7 @@ const AddTrailPage = () => {
         },
         body: JSON.stringify(trailToSave),
       });
-
+  
       if (response.ok) {
         setShowSuccessMessage(true);
         setTimeout(() => {
@@ -170,6 +193,7 @@ const AddTrailPage = () => {
       console.error('Error saving trail:', error);
     }
   };
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
