@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faStop, faMapMarkerAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -24,6 +25,7 @@ type Position = [number, number];
 
 const AddTrailPage = () => {
   const { data: session } = useSession();
+  const router = useRouter();
   const user = session?.user;
 
   const [position, setPosition] = useState<Position | null>(null);
@@ -39,11 +41,11 @@ const AddTrailPage = () => {
     photo: '',
     location: '',
   });
-
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [totalDistance, setTotalDistance] = useState<number>(0);
   const [averageSpeed, setAverageSpeed] = useState<number>(0);
   const [averagePace, setAveragePace] = useState<string>('0:00');
+  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && navigator?.geolocation) {
@@ -156,7 +158,11 @@ const AddTrailPage = () => {
       });
 
       if (response.ok) {
-        console.log('Trail saved successfully');
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          router.push('/mytrails'); // Navigate back to /mytrails after a short delay
+        }, 3000);
       } else {
         console.error('Failed to save trail:', await response.text());
       }
@@ -186,6 +192,11 @@ const AddTrailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col relative">
+      {showSuccessMessage && (
+        <div className="absolute top-0 left-0 right-0 bg-green-600 text-white text-center py-2 z-50">
+          Atividade salva com sucesso!
+        </div>
+      )}
       <div className="w-full bg-black text-white flex items-center justify-between p-4">
         <FontAwesomeIcon icon={faTimes} className="text-white text-xl" />
         <h2 className="text-2xl font-bold">Trail Run</h2>

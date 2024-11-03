@@ -1,5 +1,6 @@
-"use client"
+"use client";
 import Link from "next/link";
+import LogoutButton from "./logoutbutton"
 
 export default function Header() {
     return (
@@ -18,7 +19,9 @@ export default function Header() {
                     <Link href="/news" className="hover:text-[#BDB76B] transition duration-300">Novidades</Link>
                     <Link href="/about" className="hover:text-[#BDB76B] transition duration-300">Quem somos?</Link>
                     <Link href="/profile" className="hover:text-[#BDB76B] transition duration-300">Perfil</Link>
-                    <Link href="/trails" className="bg-[#4CBB17] text-white px-4 py-2 rounded-full hover:bg-[#6B8E23] transition duration-300">Trilhas</Link>
+                    <Link href="/mytrails" className="bg-[#4CBB17] text-white px-4 py-2 rounded-full hover:bg-[#6B8E23] transition duration-300">Trilhas</Link>
+                    {/* Botão de logout usando o componente LogoutButton */}
+                    <LogoutButton />
                 </nav>
             </div>
         </header>

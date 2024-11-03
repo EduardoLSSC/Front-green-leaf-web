@@ -1,6 +1,5 @@
 "use client";
 import Header from "@/components/personal/header";
-import LogoutButton from "@/components/personal/logoutbutton";
 import TrailCard from "@/components/personal/trailCards";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -14,7 +13,6 @@ export default function Home() {
         const fetchTrails = async () => {
             // Verifica se o token está presente
             if (session?.user?.token) {
-                console.log("Token da sessão:", session.user.token);
                 try {
                     const response = await fetch('/api/trails', {
                         method: "GET",
@@ -30,7 +28,6 @@ export default function Home() {
                     }
 
                     const data = await response.json();
-                    console.log("Trilhas recebidas:", data); // Verifica os dados recebidos da API
 
                     // Ajuste aqui: não há propriedade 'data' na resposta
                     setTrails(data); // Acessa diretamente o array de trilhas
@@ -68,7 +65,6 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-            <LogoutButton />
         </main>
     );
 }

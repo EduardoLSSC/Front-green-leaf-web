@@ -12,8 +12,6 @@ export default function ForgotPassword() {
             email: formData.get('email'),
         };
 
-        // Lógica para enviar o email de redefinição de senha
-        console.log("Email para redefinição de senha enviado:", data.email);
     }
 
     return (

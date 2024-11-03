@@ -1,8 +1,9 @@
-"use client";
+"use client"; // Ensures this is a client-side component
 
 import Image from 'next/image';
 import logo from "@/assets/images/trilhaexemplo.jpg";
 import { useState } from 'react';
+import Link from 'next/link';
 
 // Componente de Estrelas (Avaliação)
 const StarRating = () => {
@@ -73,6 +74,15 @@ const TrailPage = () => {
             </svg>
             <span>Compartilhar</span>
           </button>
+        </div>
+
+        {/* Botão para Nova Trilha */}
+        <div className="flex justify-center mt-8">
+          <Link href="/mytrails/newtrail">
+            <button className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition">
+              Criar Nova Trilha
+            </button>
+          </Link>
         </div>
       </main>
     </div>

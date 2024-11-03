@@ -55,8 +55,6 @@ export async function POST(req: Request) {
     const apiUrlTrails = `${GetDotenvVariable("ENVIROMENT")}/trails`;
     const newTrail = await req.json(); // Parse the incoming JSON body
 
-    console.log("Incoming request data:", newTrail); // Debug the request body
-
     const createResponse = await fetch(apiUrlTrails, {
       method: "POST",
       headers: {

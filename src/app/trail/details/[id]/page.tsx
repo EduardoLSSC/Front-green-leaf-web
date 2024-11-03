@@ -18,7 +18,6 @@ const TrailPage = () => {
       if (id) {
         try {
           const trailData = await fetchTrail(parseInt(id as string, 10));
-          console.log("Trail Data:", trailData); // Check the `path` data in the console
           setTrail(trailData);
         } catch (error) {
           console.error('Error fetching trail:', error);
