@@ -70,12 +70,19 @@ const AddTrailPage = () => {
           if (isTracking && !isPaused) {
             setPath((prevPath) => {
               if (prevPath.length === 0) {
-                // Add the first point by default
+                // Always add the first point
                 console.log('Adding the first point:', newPoint);
                 return [newPoint];
               }
   
+              // Add the second point even if it's the same as the first
+              if (prevPath.length === 1) {
+                console.log('Adding the second point:', newPoint);
+                return [...prevPath, newPoint];
+              }
+  
               const lastPoint = prevPath[prevPath.length - 1];
+              const secondLastPoint = prevPath[prevPath.length - 2];
               const distance = calculateDistance(
                 lastPoint[0],
                 lastPoint[1],
@@ -83,21 +90,29 @@ const AddTrailPage = () => {
                 longitude
               );
   
-              // Adjust the distance threshold for more precision (e.g., > 2 meters)
-              if (distance > 0.002) { // Smaller value for more sensitivity
-                console.log('Adding new point:', newPoint);
-                setTotalDistance((prevDistance) => prevDistance + distance);
-                setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
+              // Allow only up to two consecutive identical points
+              if (
+                (newPoint[0] !== lastPoint[0] || newPoint[1] !== lastPoint[1]) ||
+                (lastPoint[0] === secondLastPoint[0] && lastPoint[1] === secondLastPoint[1])
+              ) {
+                if (distance > 0.002) { // Adjust the threshold as needed
+                  console.log('Adding new point:', newPoint);
+                  setTotalDistance((prevDistance) => prevDistance + distance);
+                  setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
   
-                if (totalDistance > 0) {
-                  setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
+                  if (totalDistance > 0) {
+                    setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
+                  } else {
+                    setAveragePace('0:00');
+                  }
+  
+                  return [...prevPath, newPoint];
                 } else {
-                  setAveragePace('0:00');
+                  console.log('Point too close to the last one, skipping.');
+                  return prevPath;
                 }
-  
-                return [...prevPath, newPoint];
               } else {
-                console.log('Point too close to the last one, skipping.');
+                console.log('Two consecutive identical points already present, skipping.');
                 return prevPath;
               }
             });
@@ -113,7 +128,6 @@ const AddTrailPage = () => {
     }
   }, [isTracking, isPaused, totalDistance, elapsedTime]);
   
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       let timer: NodeJS.Timeout;
@@ -157,17 +171,20 @@ const AddTrailPage = () => {
       alert('Erro: O caminho precisa ter pelo menos dois pontos distintos.');
       return;
     }
-
+  
+    // Validate and ensure the coordinates are in the correct order
+    const formattedPath = path.map(([latitude, longitude]) => [longitude, latitude]);
+  
     const trailToSave = {
       ...trailData,
       distance: totalDistance,
       createdById: user?.id || null,
       path: {
         type: "LineString",
-        coordinates: path,
+        coordinates: formattedPath, // Use the correctly formatted path
       },
     };
-
+  
     try {
       const response = await fetch('/api/trails', {
         method: 'POST',
@@ -177,7 +194,7 @@ const AddTrailPage = () => {
         },
         body: JSON.stringify(trailToSave),
       });
-
+  
       if (response.ok) {
         setShowSuccessMessage(true);
         setTimeout(() => {
@@ -191,6 +208,7 @@ const AddTrailPage = () => {
       console.error('Error saving trail:', error);
     }
   };
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
