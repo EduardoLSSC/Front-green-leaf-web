@@ -66,67 +66,58 @@ const AddTrailPage = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           const newPoint: Position = [latitude, longitude];
-  
+    
           if (isTracking && !isPaused) {
-            setPath((prevPath) => {
-              if (prevPath.length === 0) {
-                // Always add the first point
-                console.log('Adding the first point:', newPoint);
-                return [newPoint];
-              }
-  
-              // Add the second point even if it's the same as the first
-              if (prevPath.length === 1) {
-                console.log('Adding the second point:', newPoint);
-                return [...prevPath, newPoint];
-              }
-  
-              const lastPoint = prevPath[prevPath.length - 1];
-              const secondLastPoint = prevPath[prevPath.length - 2];
-              const distance = calculateDistance(
-                lastPoint[0],
-                lastPoint[1],
-                latitude,
-                longitude
-              );
-  
-              // Allow only up to two consecutive identical points
-              if (
-                (newPoint[0] !== lastPoint[0] || newPoint[1] !== lastPoint[1]) ||
-                (lastPoint[0] === secondLastPoint[0] && lastPoint[1] === secondLastPoint[1])
-              ) {
-                if (distance > 0.002) { // Adjust the threshold as needed
-                  console.log('Adding new point:', newPoint);
-                  setTotalDistance((prevDistance) => prevDistance + distance);
-                  setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
-  
-                  if (totalDistance > 0) {
-                    setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
-                  } else {
-                    setAveragePace('0:00');
-                  }
-  
-                  return [...prevPath, newPoint];
-                } else {
-                  console.log('Point too close to the last one, skipping.');
-                  return prevPath;
-                }
-              } else {
-                console.log('Two consecutive identical points already present, skipping.');
-                return prevPath;
-              }
-            });
+            setPosition(newPoint);
           }
-  
-          setPosition(newPoint);
         },
         (error) => console.error("Error obtaining location:", error),
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
       );
   
-      return () => navigator.geolocation.clearWatch(watchId);
+      const saveInterval = setInterval(() => {
+        if (isTracking && !isPaused && position) {
+          setPath((prevPath) => {
+            if (prevPath.length === 0) {
+              return [position]; // Add the first point
+            }
+  
+            if (prevPath.length === 1) {
+              return [...prevPath, position]; // Add the second point
+            }
+  
+            const lastPoint = prevPath[prevPath.length - 1];
+            const distance = calculateDistance(lastPoint[0], lastPoint[1], position[0], position[1]);
+  
+            // Allow only up to two consecutive identical points and distance threshold
+            if (
+              (position[0] !== lastPoint[0] || position[1] !== lastPoint[1]) &&
+              distance > 0.002 // Adjust as needed
+            ) {
+              setTotalDistance((prevDistance) => prevDistance + distance);
+              setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
+  
+              if (totalDistance > 0) {
+                setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
+              } else {
+                setAveragePace('0:00');
+              }
+  
+              return [...prevPath, position];
+            }
+  
+            return prevPath;
+          });
+        }
+      }, 3000); // Run every 3 seconds
+  
+      return () => {
+        navigator.geolocation.clearWatch(watchId);
+        clearInterval(saveInterval);
+      };
     }
-  }, [isTracking, isPaused, totalDistance, elapsedTime]);
+  }, [isTracking, isPaused, position, totalDistance, elapsedTime]);
+  
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
