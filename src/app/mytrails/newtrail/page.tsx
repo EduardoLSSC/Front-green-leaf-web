@@ -175,10 +175,12 @@ const AddTrailPage = () => {
   
     // Validate and ensure the coordinates are in the correct order
     const formattedPath = path.map(([latitude, longitude]) => [longitude, latitude]);
+
+    const formattedDistance = Math.round(totalDistance);
   
     const trailToSave = {
       ...trailData,
-      distance: totalDistance,
+      distance: formattedDistance,
       createdById: user?.id || null,
       path: {
         type: "LineString",
