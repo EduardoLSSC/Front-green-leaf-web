@@ -66,14 +66,15 @@ const AddTrailPage = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           const newPoint: Position = [latitude, longitude];
-
+  
           if (isTracking && !isPaused) {
             setPath((prevPath) => {
               if (prevPath.length === 0) {
+                // Add the first point by default
                 console.log('Adding the first point:', newPoint);
                 return [newPoint];
               }
-
+  
               const lastPoint = prevPath[prevPath.length - 1];
               const distance = calculateDistance(
                 lastPoint[0],
@@ -81,18 +82,19 @@ const AddTrailPage = () => {
                 latitude,
                 longitude
               );
-
-              if (distance > 0.005) {
+  
+              // Adjust the distance threshold for more precision (e.g., > 2 meters)
+              if (distance > 0.002) { // Smaller value for more sensitivity
                 console.log('Adding new point:', newPoint);
                 setTotalDistance((prevDistance) => prevDistance + distance);
                 setAverageSpeed((totalDistance / 1000) / (elapsedTime / 3600));
-
+  
                 if (totalDistance > 0) {
                   setAveragePace(`${Math.floor(elapsedTime / (totalDistance / 1000))}:${('0' + Math.floor((elapsedTime % (totalDistance / 1000)))).slice(-2)}`);
                 } else {
                   setAveragePace('0:00');
                 }
-
+  
                 return [...prevPath, newPoint];
               } else {
                 console.log('Point too close to the last one, skipping.');
@@ -100,16 +102,17 @@ const AddTrailPage = () => {
               }
             });
           }
-
+  
           setPosition(newPoint);
         },
-        (error) => console.error("Erro ao obter a localização:", error),
+        (error) => console.error("Error obtaining location:", error),
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
       );
-
+  
       return () => navigator.geolocation.clearWatch(watchId);
     }
   }, [isTracking, isPaused, totalDistance, elapsedTime]);
+  
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
