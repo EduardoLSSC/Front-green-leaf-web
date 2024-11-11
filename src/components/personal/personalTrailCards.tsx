@@ -1,20 +1,28 @@
 import logo from "@/assets/images/trilhaexemplo.jpg";
-import Image from "next/image";
+import Image, { StaticImageData } from 'next/image';
+
 interface TrailCardProps {
-    image: string;
-    title: string;
-    distance: string;
-    location: string;
-  }
+  image: string | StaticImageData;
+  title: string;
+  distance: string;
+  location: string;
+}
   
   const PersonalTrailCards: React.FC<TrailCardProps> = ({ image, title, distance, location }) => {
     return (
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <Image src={logo} alt={title} className="h-40 w-full object-cover" />
+      <div className="trail-card bg-white shadow-md rounded-lg overflow-hidden">
+        <Image
+          src={image}
+          alt={title}
+          className="w-full h-48 object-cover"
+          layout="responsive"
+          width={300}
+          height={200}
+        />
         <div className="p-4">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <p className="text-sm text-gray-500">{distance}</p>
-          <p className="text-sm text-gray-400">{location}</p>
+          <h3 className="text-lg font-bold">{title}</h3>
+          <p className="text-gray-600">Distância: {distance}</p>
+          <p className="text-gray-600">Localização: {location}</p>
         </div>
       </div>
     );
