@@ -51,9 +51,9 @@ export default function Home() {
     }
 
     return (
-        <main>
+        <main className="dark:bg-dark">
             <Header /> {/* Inclua o cabeçalho se necessário */}
-            <div className="flex flex-row items-end">
+            <div className="flex flex-row items-end dark:text-white">
                 <h1 className="text-5xl font-serif">Trilhas</h1>
                 <p className="pl-2">{trails.length} itens</p>
             </div>

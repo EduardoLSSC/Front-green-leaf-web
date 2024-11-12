@@ -45,7 +45,8 @@ export default function TrailCard({ trail }: { trail: Trail }) {
 
   return (
     <main>
-      <Card className="w-full max-h-[150px] rounded-2xl bg-[#FAFAF5] cursor-pointer" onClick={handleRedirect}>
+      <Card className="hover:border-dark-selected w-full max-h-[150px] rounded-2xl bg-[#FAFAF5] cursor-pointer
+      dark:bg-medium " onClick={handleRedirect}>
         <div className="flex flex-row md:flex-row">
           <div className="w-40 h-[150px] relative overflow-hidden rounded-l-2xl">
             <Image 
@@ -58,17 +59,17 @@ export default function TrailCard({ trail }: { trail: Trail }) {
           </div>
           <div className="flex flex-col w-full">
             <CardHeader>
-              <CardTitle className="flex flex-row justify-between">
+              <CardTitle className="flex flex-row justify-between dark:text-white">
                 <h1>{trail.name}</h1> {/* Nome da trilha */}
                 <h1>{trail.difficulty}</h1> {/* Dificuldade */}
               </CardTitle>
-              <CardDescription className="text-[#426B1F]">
+              <CardDescription className="text-[#426B1F] dark:text-dark-green">
                 <strong>{trail.distance} Km</strong>
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col justify-between h-full"> {/* Faz a área do conteúdo ocupar todo o espaço disponível */}
               <div className="flex flex-col mt-1">
-                <p className="text-gray-500">{trail.author}</p> {/* Nome do autor */}
+                <p className="text-gray-500 dark:text-white">{trail.author}</p> {/* Nome do autor */}
                 <div className="flex items-center justify-between mt-1"> {/* Flex para alinhar as estrelas e os botões */}
                   <div className="flex items-center">
                     {renderStars(rating)} {/* Renderiza as estrelas fixas */}

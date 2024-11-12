@@ -67,7 +67,7 @@ const AccountPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-dark">
       <main className="container mx-auto my-8">
         <div className="flex items-center space-x-4 mb-8">
           <Image
@@ -77,7 +77,7 @@ const AccountPage = () => {
             height={100}
             className="rounded-full"
           />
-          <h2 className="text-4xl font-bold">Minha Conta</h2>
+          <h2 className="text-4xl font-bold dark:text-white">Minha Conta</h2>
         </div>
 
         <div className="mb-6">
@@ -88,10 +88,10 @@ const AccountPage = () => {
             height={200}
             className="w-full object-cover rounded"
           />
-          <h3 className="text-2xl font-bold text-center mt-2">Minhas Trilhas</h3>
+          <h3 className="text-2xl font-bold text-center mt-2 dark:text-white">Minhas Trilhas</h3>
         </div>
 
-        <div className="bg-green-200 p-4 rounded-lg text-lg mb-6">
+        <div className="bg-green-200 p-4 rounded-lg text-lg dark:bg-dark-selected">
           <p>Trilhas Visitadas: <span className="font-bold">{trailsVisited || 0}</span></p>
           <p>Distância Percorrida: <span className="font-bold">{totalDistance || 0} KM</span></p>
         </div>
