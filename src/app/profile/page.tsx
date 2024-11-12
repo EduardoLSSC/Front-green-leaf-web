@@ -4,8 +4,9 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react"; // Importando o useSession
 import logo from "@/assets/images/logoBg.png";
-import trilha from "@/assets/images/trilhaexemplo.jpg";
 import { useRouter } from 'next/navigation'; // Importando useRouter
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 // Defina a interface aqui se não estiver importando
 interface User {
@@ -28,9 +29,6 @@ interface Trail {
 const AccountPage = () => {
   const { data: session } = useSession(); // Obtendo a sessão
   const user = session?.user; // Acessando os dados do usuário da sessão
-  const router = useRouter(); // Inicializa o useRouter
-
-  const [userTrails, setUserTrails] = useState<Trail[]>([]); // Estado para trilhas do usuário
   const [totalDistance, setTotalDistance] = useState<number>(0); // Total de distância percorrida
   const [trailsVisited, setTrailsVisited] = useState<number>(0); // Número de trilhas visitadas
 
@@ -44,8 +42,7 @@ const AccountPage = () => {
         const data = await response.json();
 
         // Filtra as trilhas para incluir apenas aquelas criadas pelo usuário logado
-        const myTrails = data.filter((trail: Trail) => trail.createdBy.id === user?.id);
-        setUserTrails(myTrails); // Armazena as trilhas do usuário no estado
+        const myTrails = data.filter((trail: Trail) => trail.createdBy.id === user?.id);// Armazena as trilhas do usuário no estado
         
         // Calcular distância total e número de trilhas
         const totalDistance = myTrails.reduce((acc: any, trail: any) => acc + trail.distance, 0);
@@ -59,12 +56,7 @@ const AccountPage = () => {
     if (user) {
       fetchUserTrails();
     }
-  }, [user]); // Inclui user como dependência para garantir que a filtragem funcione
-
-  // Função para redirecionar para a página de adicionar trilha
-  const handleAddTrail = () => {
-    router.push('/mytrails/newtrail'); // Mude o caminho conforme necessário
-  };
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-dark">
@@ -78,17 +70,11 @@ const AccountPage = () => {
             className="rounded-full"
           />
           <h2 className="text-4xl font-bold dark:text-white">Minha Conta</h2>
-        </div>
-
-        <div className="mb-6">
-          <Image
-            src={trilha}
-            alt="Minhas Trilhas"
-            width={800}
-            height={200}
-            className="w-full object-cover rounded"
-          />
-          <h3 className="text-2xl font-bold text-center mt-2 dark:text-white">Minhas Trilhas</h3>
+          <div className='flex justify-between'>
+            <Button className="hover:bg-green-700 rounded-full text-2xl font-bold text-center text-white mt-2 bg-green-600 dark:text-white"
+             ><Link href={"/mytrails"}>Minhas trilhas</Link></Button>
+          </div>
+          
         </div>
 
         <div className="bg-green-200 p-4 rounded-lg text-lg dark:bg-dark-selected">
@@ -98,38 +84,6 @@ const AccountPage = () => {
 
         <div className="bg-yellow-100 p-4 rounded-lg text-lg text-center">
           <h4 className="font-bold">Minha Pontuação</h4>
-        </div>
-
-        {/* Exibir trilhas do usuário */}
-        <div className="mt-6">
-          <h4 className="text-xl font-bold mb-4">Minhas Trilhas:</h4>
-          <ul className="space-y-2">
-            {userTrails.length > 0 ? (
-              userTrails.map((trail) => (
-                <li key={trail.id} className="bg-white border p-4 rounded-lg shadow">
-                  <h5 className="font-bold">{trail.name}</h5>
-                  <p>Dificuldade: {trail.difficulty}</p>
-                  <p>Distância: {trail.distance} km</p>
-                  <p>Avaliação: {trail.rating} estrelas</p>
-                  <p>Autor: {trail.author}</p>
-                </li>
-              ))
-            ) : (
-              <p>Nenhuma trilha encontrada.</p>
-            )}
-          </ul>
-        </div>
-
-        <div className="flex justify-end mt-6">
-          <button 
-            onClick={handleAddTrail} // Redireciona para a página de adicionar trilha
-            className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 flex items-center space-x-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Adicionar</span>
-          </button>
         </div>
       </main>
     </div>

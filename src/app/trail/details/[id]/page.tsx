@@ -31,9 +31,9 @@ const TrailPage = () => {
   if (!trail) return <div>Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-dark">
       <main className="container mx-auto my-8">
-        <h2 className="text-4xl font-bold text-center my-6">{trail.name}</h2>
+        <h2 className="text-4xl font-bold text-center my-6 dark:text-white">{trail.name}</h2>
         <div className="mb-6">
           <img src={trail.photo} alt="Trail map" className="w-full object-cover" />
         </div>
