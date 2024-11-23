@@ -233,20 +233,34 @@ const AddTrailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col relative">
+    <div className="min-h-screen bg-gradient-to-b from-green-900 to-green-700 text-white flex flex-col relative">
       {showSuccessMessage && (
-        <div className="absolute top-0 left-0 right-0 bg-green-600 text-white text-center py-2 z-50">
+        <div className="absolute top-0 left-0 right-0 bg-green-600 text-white text-center py-2 z-50 shadow-md">
           Atividade salva com sucesso!
         </div>
       )}
-      <div className="w-full bg-black text-white flex items-center justify-between p-4">
-        <FontAwesomeIcon icon={faTimes} className="text-white text-xl" />
-        <h2 className="text-xl md:text-2xl font-bold">Trail Run</h2>
-        <FontAwesomeIcon icon={faMapMarkerAlt} className="text-white text-xl" onClick={() => setIsMapVisible(true)} />
+      {/* Topo da página */}
+      <div className="w-full bg-green-800 text-white flex items-center justify-between p-4 shadow-lg">
+        <FontAwesomeIcon
+          icon={faTimes}
+          className="text-white text-xl cursor-pointer hover:text-red-500"
+          onClick={() => router.push("/mytrails")}
+        />
+        <h2 className="text-xl md:text-2xl font-bold">Adicionar Trilha</h2>
+        <FontAwesomeIcon
+          icon={faMapMarkerAlt}
+          className="text-white text-xl cursor-pointer hover:text-yellow-400"
+          onClick={() => setIsMapVisible(true)}
+        />
       </div>
-
+  
+      {/* Mapa */}
       {isMapVisible && position && (
-        <MapContainer center={position} zoom={13} className="h-64 mb-4 rounded-lg shadow-lg w-full">
+        <MapContainer
+          center={position}
+          zoom={13}
+          className="h-64 mb-4 rounded-lg shadow-lg w-full"
+        >
           <LayersControl position="topright">
             <BaseLayer checked name="OpenStreetMap">
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -259,48 +273,83 @@ const AddTrailPage = () => {
           <ZoomControl position="topright" />
         </MapContainer>
       )}
-
-      <div className="flex flex-col items-center justify-between bg-gray-900 p-4 space-y-4 flex-grow">
+  
+      {/* Conteúdo principal */}
+      <div className="flex flex-col items-center justify-between bg-green-800 p-4 space-y-4 flex-grow">
+        {/* Se não estiver no formulário */}
         {!isFormVisible ? (
           <div className="w-full">
+            {/* Métricas */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center text-white w-full">
-              <div className="border-b border-gray-700 p-2">
+              <div className="border-b border-green-600 p-2">
                 <h3 className="text-base md:text-lg">Tempo</h3>
-                <p className="text-3xl md:text-5xl font-bold">{Math.floor(elapsedTime / 60)}:{('0' + (elapsedTime % 60)).slice(-2)}</p>
+                <p className="text-3xl md:text-5xl font-bold">
+                  {Math.floor(elapsedTime / 60)}:
+                  {("0" + (elapsedTime % 60)).slice(-2)}
+                </p>
               </div>
-              <div className="border-b border-gray-700 p-2">
+              <div className="border-b border-green-600 p-2">
                 <h3 className="text-base md:text-lg">Distância</h3>
-                <p className="text-3xl md:text-5xl font-bold">{(totalDistance > 0 ? (totalDistance / 1000).toFixed(2) : '0.00')} km</p>
+                <p className="text-3xl md:text-5xl font-bold">
+                  {(totalDistance > 0
+                    ? (totalDistance / 1000).toFixed(2)
+                    : "0.00")}{" "}
+                  km
+                </p>
               </div>
-              <div className="border-b border-gray-700 p-2">
+              <div className="border-b border-green-600 p-2">
                 <h3 className="text-base md:text-lg">Velocidade Média</h3>
-                <p className="text-3xl md:text-5xl font-bold">{(totalDistance > 0 ? averageSpeed.toFixed(2) : '0.00')} km/h</p>
+                <p className="text-3xl md:text-5xl font-bold">
+                  {(totalDistance > 0 ? averageSpeed.toFixed(2) : "0.00")} km/h
+                </p>
               </div>
               <div className="p-2">
                 <h3 className="text-base md:text-lg">Ritmo Médio</h3>
                 <p className="text-3xl md:text-5xl font-bold">{averagePace} /km</p>
               </div>
             </div>
-
+  
+            {/* Botões de ação */}
             <div className="flex flex-wrap justify-center sm:justify-between mt-8 gap-4">
               {!isTracking || isPaused ? (
-                <button onClick={handleStart} className="bg-orange-600 p-3 sm:p-4 rounded-full shadow-md text-white flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16">
+                <button
+                  onClick={handleStart}
+                  className="bg-green-600 p-3 sm:p-4 rounded-full shadow-md text-white flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 hover:bg-green-700"
+                >
                   <FontAwesomeIcon icon={faPlay} className="text-lg sm:text-2xl" />
                 </button>
               ) : (
-                <button onClick={handlePause} className="bg-yellow-600 p-3 sm:p-4 rounded-full shadow-md text-white flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16">
+                <button
+                  onClick={handlePause}
+                  className="bg-yellow-500 p-3 sm:p-4 rounded-full shadow-md text-white flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 hover:bg-yellow-600"
+                >
                   <FontAwesomeIcon icon={faPause} className="text-lg sm:text-2xl" />
                 </button>
               )}
-              <button onClick={handleFinish} className="bg-red-600 p-3 sm:p-4 rounded-full shadow-md text-white flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16">
+              <button
+                onClick={handleFinish}
+                className="bg-red-600 p-3 sm:p-4 rounded-full shadow-md text-white flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 hover:bg-red-700"
+              >
                 <FontAwesomeIcon icon={faStop} className="text-lg sm:text-2xl" />
               </button>
             </div>
           </div>
         ) : (
-          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-md md:max-w-lg">
+          /* Formulário */
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+            className="bg-green-700 p-4 rounded-lg shadow-lg w-full max-w-md md:max-w-lg"
+          >
             <div className="mb-4">
-              <label htmlFor="name" className="block text-base md:text-lg font-medium">Nome da Atividade</label>
+              <label
+                htmlFor="name"
+                className="block text-base md:text-lg font-medium text-white"
+              >
+                Nome da Atividade
+              </label>
               <input
                 type="text"
                 name="name"
@@ -308,11 +357,16 @@ const AddTrailPage = () => {
                 value={trailData.name}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
+                className="mt-1 block w-full p-2 bg-green-800 border border-green-600 rounded text-white"
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="location" className="block text-base md:text-lg font-medium">Localização</label>
+              <label
+                htmlFor="location"
+                className="block text-base md:text-lg font-medium text-white"
+              >
+                Localização
+              </label>
               <input
                 type="text"
                 name="location"
@@ -320,53 +374,37 @@ const AddTrailPage = () => {
                 value={trailData.location}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
+                className="mt-1 block w-full p-2 bg-green-800 border border-green-600 rounded text-white"
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="description" className="block text-base md:text-lg font-medium">Como foi?</label>
+              <label
+                htmlFor="description"
+                className="block text-base md:text-lg font-medium text-white"
+              >
+                Como foi?
+              </label>
               <textarea
                 name="description"
                 id="description"
                 value={trailData.description}
                 onChange={handleChange}
                 rows={3}
-                className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
+                className="mt-1 block w-full p-2 bg-green-800 border border-green-600 rounded text-white"
               />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="difficulty" className="block text-base md:text-lg font-medium">Dificuldade</label>
-              <select
-                name="difficulty"
-                id="difficulty"
-                value={trailData.difficulty}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
-              >
-                <option value="">Selecione a dificuldade</option>
-                <option value="Fácil">Fácil</option>
-                <option value="Médio">Médio</option>
-                <option value="Difícil">Difícil</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="photo" className="block text-base md:text-lg font-medium">Adicionar Fotos/Vídeos</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="mt-1 block w-full p-2 bg-gray-900 border border-gray-700 rounded"
-              />
-              {trailData.photo && (
-                <img src={trailData.photo} alt="Preview" className="mt-2 w-full h-auto rounded" />
-              )}
             </div>
             <div className="flex flex-col sm:flex-row justify-center sm:justify-between mt-6 gap-4">
-              <button type="button" onClick={handleDiscard} className="bg-red-600 text-white p-2 sm:p-3 rounded-full w-full sm:w-1/2 hover:bg-red-700">
+              <button
+                type="button"
+                onClick={handleDiscard}
+                className="bg-red-600 text-white p-2 sm:p-3 rounded-full w-full sm:w-1/2 hover:bg-red-700"
+              >
                 Descartar Atividade
               </button>
-              <button type="submit" className="bg-orange-600 text-white p-2 sm:p-3 rounded-full w-full sm:w-1/2 hover:bg-orange-700">
+              <button
+                type="submit"
+                className="bg-orange-600 text-white p-2 sm:p-3 rounded-full w-full sm:w-1/2 hover:bg-orange-700"
+              >
                 Salvar Atividade
               </button>
             </div>
@@ -375,6 +413,6 @@ const AddTrailPage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default AddTrailPage;

@@ -107,15 +107,6 @@ const TrailPage = () => {
         {/* Nome da Trilha */}
         <h1 className="text-4xl font-bold text-center mb-6">{trail.name}</h1>
 
-        {/* Imagem da Trilha */}
-        <div className="mb-6">
-          <img
-            src={trail.photo || "/images/default-trail.jpg"}
-            alt="Trail"
-            className="w-full h-60 object-cover rounded-lg shadow-lg"
-          />
-        </div>
-
         {/* Informações da Trilha */}
         <div className="bg-white text-gray-800 p-6 rounded-2xl shadow-xl mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,17 +123,13 @@ const TrailPage = () => {
             <p className="text-lg">
               <span className="font-bold text-green-700">Localização:</span> {trail.location}
             </p>
-            <p className="text-lg">
-              <span className="font-bold text-green-700">Criado por:</span>{" "}
-              {trail.createdBy?.firstName || "Desconhecido"} {trail.createdBy?.lastName || ""}
-            </p>
           </div>
         </div>
 
         {/* Mapa da Trilha */}
         {trail.path?.coordinates ? (
           <div className="mb-8 rounded-2xl overflow-hidden shadow-xl">
-            <TrailMap path={trail.path.coordinates} />
+            <TrailMap path={trail.path.coordinates} className="h-[400px] w-full" />
           </div>
         ) : (
           <p className="text-center text-white">Sem dados de rota disponíveis para esta trilha.</p>
@@ -173,7 +160,7 @@ const TrailPage = () => {
             <p className="text-center text-gray-600">Nenhum comentário encontrado.</p>
           )}
 
-          {/* Box para adicionar novo comentário */}
+          {/* Adicionar novo comentário */}
           <div className="mt-8">
             <h3 className="text-lg font-bold text-green-700 mb-4">Adicione um comentário:</h3>
             <textarea
