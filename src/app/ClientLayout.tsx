@@ -22,7 +22,12 @@ export default function ClientLayout({
     <>
       {/* Renderiza Header e Footer apenas se a rota não estiver na lista */}
       {!hideHeaderFooter && <Header />}
-      <main className={`flex-grow ${!hideHeaderFooter ? 'mt-32' : ''}`}>
+      <main
+        className={`flex-grow`}
+        style={{
+          marginTop: hideHeaderFooter ? "0" : "64px",
+        }}
+      >
         {/* O SessionProvider precisa estar no client-side */}
         <SessionProvider>{children}</SessionProvider>
       </main>

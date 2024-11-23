@@ -31,8 +31,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     const trailData = await trailResponse.json();
 
-    console.log(trailData)
-
     // Parse the path if it's a JSON string
     if (trailData.path && typeof trailData.path === "string") {
       trailData.path = JSON.parse(trailData.path);

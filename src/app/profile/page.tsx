@@ -1,13 +1,9 @@
 "use client";
 
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import { useSession } from "next-auth/react"; // Importando o useSession
-import logo from "@/assets/images/logoBg.png";
-import trilha from "@/assets/images/trilhaexemplo.jpg";
-import { useRouter } from 'next/navigation'; // Importando useRouter
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-// Defina a interface aqui se não estiver importando
 interface User {
   id: string;
   firstName: string;
@@ -18,39 +14,42 @@ interface Trail {
   id: string;
   name: string;
   difficulty: string;
-  distance: number; // Distância da trilha
+  distance: number; // Distância em metros
   rating: number;
-  photo: string;
-  createdBy: User; // Propriedade para o usuário que criou a trilha
+  photo: string; // Caminho para a imagem da trilha
+  createdBy: User;
   author?: string;
 }
 
 const AccountPage = () => {
-  const { data: session } = useSession(); // Obtendo a sessão
-  const user = session?.user; // Acessando os dados do usuário da sessão
-  const router = useRouter(); // Inicializa o useRouter
+  const { data: session } = useSession();
+  const user = session?.user;
+  const router = useRouter();
 
-  const [userTrails, setUserTrails] = useState<Trail[]>([]); // Estado para trilhas do usuário
-  const [totalDistance, setTotalDistance] = useState<number>(0); // Total de distância percorrida
-  const [trailsVisited, setTrailsVisited] = useState<number>(0); // Número de trilhas visitadas
+  const [userTrails, setUserTrails] = useState<Trail[]>([]);
+  const [totalDistance, setTotalDistance] = useState<number>(0);
+  const [trailsVisited, setTrailsVisited] = useState<number>(0);
 
   useEffect(() => {
     const fetchUserTrails = async () => {
       try {
-        const response = await fetch('/api/trails');
+        const response = await fetch("/api/trails");
         if (!response.ok) {
-          throw new Error('Erro ao buscar trilhas');
+          throw new Error("Erro ao buscar trilhas");
         }
         const data = await response.json();
 
-        // Filtra as trilhas para incluir apenas aquelas criadas pelo usuário logado
-        const myTrails = data.filter((trail: Trail) => trail.createdBy.id === user?.id);
-        setUserTrails(myTrails); // Armazena as trilhas do usuário no estado
-        
-        // Calcular distância total e número de trilhas
-        const totalDistance = myTrails.reduce((acc: any, trail: any) => acc + trail.distance, 0);
-        setTotalDistance(totalDistance);
-        setTrailsVisited(myTrails.length); // Atualiza o número de trilhas visitadas
+        const myTrails = data.filter(
+          (trail: Trail) => trail.createdBy.id === user?.id
+        );
+        setUserTrails(myTrails);
+
+        const totalDistanceInMeters = myTrails.reduce(
+          (acc: number, trail: Trail) => acc + trail.distance,
+          0
+        );
+        setTotalDistance(totalDistanceInMeters / 1000); // Converte metros para quilômetros
+        setTrailsVisited(myTrails.length);
       } catch (error) {
         console.error(error);
       }
@@ -59,79 +58,94 @@ const AccountPage = () => {
     if (user) {
       fetchUserTrails();
     }
-  }, [user]); // Inclui user como dependência para garantir que a filtragem funcione
+  }, [user]);
 
-  // Função para redirecionar para a página de adicionar trilha
   const handleAddTrail = () => {
-    router.push('/mytrails/newtrail'); // Mude o caminho conforme necessário
+    router.push("/mytrails/newtrail");
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <main className="container mx-auto my-8">
-        <div className="flex items-center space-x-4 mb-8">
-          <Image
-            src={logo}
-            alt="Foto do perfil"
-            width={100}
-            height={100}
-            className="rounded-full"
-          />
-          <h2 className="text-4xl font-bold">Minha Conta</h2>
+    <div className="min-h-screen bg-gradient-to-b from-green-700 via-green-500 to-green-400 text-white">
+      <main className="container mx-auto px-4 py-8">
+        {/* Estatísticas do usuário */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white text-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition">
+            <h3 className="text-xl font-bold mb-4 text-green-700">Estatísticas</h3>
+            <p className="text-lg">
+              Trilhas Visitadas:{" "}
+              <span className="font-bold text-green-700">{trailsVisited || 0}</span>
+            </p>
+            <p className="text-lg">
+              Distância Percorrida:{" "}
+              <span className="font-bold text-green-700">
+                {totalDistance.toFixed(2)} km
+              </span>
+            </p>
+          </div>
+
+          <div className="bg-white text-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition">
+            <h3 className="text-xl font-bold mb-4 text-green-700">Pontuação</h3>
+            <p className="text-center text-3xl font-bold text-green-600">
+              {trailsVisited * 10 || 0}
+            </p>
+            <p className="text-sm text-gray-500 mt-2 text-center">
+              Ganhe mais pontos explorando e criando trilhas!
+            </p>
+          </div>
         </div>
 
-        <div className="mb-6">
-          <Image
-            src={trilha}
-            alt="Minhas Trilhas"
-            width={800}
-            height={200}
-            className="w-full object-cover rounded"
-          />
-          <h3 className="text-2xl font-bold text-center mt-2">Minhas Trilhas</h3>
-        </div>
-
-        <div className="bg-green-200 p-4 rounded-lg text-lg mb-6">
-          <p>Trilhas Visitadas: <span className="font-bold">{trailsVisited || 0}</span></p>
-          <p>Distância Percorrida: <span className="font-bold">{totalDistance || 0} KM</span></p>
-        </div>
-
-        <div className="bg-yellow-100 p-4 rounded-lg text-lg text-center">
-          <h4 className="font-bold">Minha Pontuação</h4>
-        </div>
-
-        {/* Exibir trilhas do usuário */}
-        <div className="mt-6">
-          <h4 className="text-xl font-bold mb-4">Minhas Trilhas:</h4>
-          <ul className="space-y-2">
-            {userTrails.length > 0 ? (
-              userTrails.map((trail) => (
-                <li key={trail.id} className="bg-white border p-4 rounded-lg shadow">
-                  <h5 className="font-bold">{trail.name}</h5>
-                  <p>Dificuldade: {trail.difficulty}</p>
-                  <p>Distância: {trail.distance} km</p>
-                  <p>Avaliação: {trail.rating} estrelas</p>
-                  <p>Autor: {trail.author}</p>
+        {/* Trilhas do usuário */}
+        <div>
+          <h3 className="text-2xl font-bold mb-4">Minhas Trilhas</h3>
+          {userTrails.length > 0 ? (
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userTrails.map((trail) => (
+                <li
+                  key={trail.id}
+                  className="bg-white text-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition"
+                >
+                  {/* Imagem da trilha */}
+                  <div className="relative h-40 rounded-xl overflow-hidden mb-4">
+                    <img
+                      src={trail.photo || "/images/default-trail.jpg"} // Mostra imagem padrão se não houver foto
+                      alt={trail.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {/* Informações da trilha */}
+                  <h4 className="text-lg font-bold text-green-700">{trail.name}</h4>
+                  <p className="text-gray-600 mt-2">
+                    <span className="font-bold">Dificuldade:</span> {trail.difficulty}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-bold">Distância:</span>{" "}
+                    {(trail.distance / 1000).toFixed(2)} km
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-bold">Avaliação:</span> {trail.rating} estrelas
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-bold">Autor:</span> {trail.author}
+                  </p>
                 </li>
-              ))
-            ) : (
-              <p>Nenhuma trilha encontrada.</p>
-            )}
-          </ul>
-        </div>
-
-        <div className="flex justify-end mt-6">
-          <button 
-            onClick={handleAddTrail} // Redireciona para a página de adicionar trilha
-            className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 flex items-center space-x-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Adicionar</span>
-          </button>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-lg text-center text-white mt-4">
+              Você ainda não tem trilhas criadas.
+            </p>
+          )}
         </div>
       </main>
+
+      {/* Botão fixo para adicionar trilha */}
+      <button
+        onClick={handleAddTrail}
+        className="fixed bottom-6 right-6 bg-green-800 hover:bg-green-900 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition-all"
+        aria-label="Adicionar trilha"
+      >
+        +
+      </button>
     </div>
   );
 };

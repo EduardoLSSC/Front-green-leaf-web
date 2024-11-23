@@ -1,10 +1,8 @@
-"use client"; // Ensures this is a client-side component
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import TrailCard from '@/components/personal/personalTrailCards';
-import logo from "@/assets/images/logoBg.png";
-import { useSession } from 'next-auth/react';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Trail } from "../../interfaces/Trails";
 
 const MyTrailsPage = () => {
@@ -13,75 +11,94 @@ const MyTrailsPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTrails = async () => {
+    const fetchUserTrails = async () => {
+      if (!session?.user?.token) {
+        console.error("Usuário não autenticado.");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await fetch('/api/trails', {
+        const response = await fetch("/api/trails", {
           headers: {
-            Authorization: `Bearer ${session?.user?.token}`,
+            Authorization: `Bearer ${session.user.token}`, // Autenticação com token
           },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch trails');
+          throw new Error("Erro ao buscar trilhas.");
         }
 
         const data = await response.json();
-        setTrails(data);
+
+        // Filtra trilhas criadas pelo usuário logado
+        const userTrails = data.filter(
+          (trail: Trail) => trail.createdBy?.id === session.user.id
+        );
+
+        setTrails(userTrails);
       } catch (error) {
-        console.error('Error fetching trails:', error);
+        console.error("Erro ao buscar trilhas:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (session?.user?.token) {
-      fetchTrails();
-    }
+    fetchUserTrails();
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-green-700 via-green-500 to-green-400 text-white">
       <div className="container mx-auto px-4 py-8">
-        <header className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold">Minhas Trilhas</h1>
-          <div className="flex items-center space-x-2 text-sm">
-            <span>Editado em — 22/2/2024</span>
-            <button className="bg-gray-200 px-3 py-1 rounded-full">Default</button>
-            <button className="bg-gray-200 px-3 py-1 rounded-full">A-Z</button>
-            <button className="bg-gray-200 px-3 py-1 rounded-full">Lista</button>
-          </div>
+        {/* Header */}
+        <header className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold">Minhas Trilhas</h1>
         </header>
-        <hr className='mt-4 pt-2' />
 
+        {/* Loading or Content */}
         {loading ? (
-          <p className="text-center mt-8">Carregando trilhas...</p>
+          <p className="text-center text-lg">Carregando trilhas...</p>
         ) : trails.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {trails.map((trail) => (
-              <Link key={trail.id} href={`/trail/details/${trail.id}`}>
-                <TrailCard
-                  image={trail.photo || logo}
-                  title={trail.name}
-                  distance={`${trail.distance} km`}
-                  location={trail.location}
-                />
+              <Link key={trail.id} href={`/trail/details/${trail.id}`} passHref>
+                <div className="bg-white text-gray-800 rounded-xl shadow-lg hover:shadow-xl transition overflow-hidden">
+                  <img
+                    src={trail.photo || "/images/default-trail.jpg"} // Exibe imagem padrão se não houver foto
+                    alt={trail.name}
+                    className="h-40 w-full object-cover"
+                  />
+                  <div className="p-4">
+                    <h2 className="text-xl font-bold text-green-700">{trail.name}</h2>
+                    <p className="text-gray-600 mt-2">
+                      <span className="font-bold">Dificuldade:</span> {trail.difficulty}
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-bold">Distância:</span>{" "}
+                      {(trail.distance / 1000).toFixed(2)} km
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-bold">Avaliação:</span> {trail.rating} estrelas
+                    </p>
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
         ) : (
-          <p className="text-center mt-8">Nenhuma trilha encontrada.</p>
+          <p className="text-center text-lg">Nenhuma trilha encontrada.</p>
         )}
-
-        <div className="flex justify-end space-x-4 mt-6">
-          <Link href="/mytrails/newtrail">
-            <button className="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-          </Link>
-        </div>
       </div>
+
+      {/* Botão fixo para adicionar trilha */}
+      <button
+        onClick={() => window.location.href = "/mytrails/newtrail"}
+        className="fixed bottom-6 right-6 bg-green-800 hover:bg-green-900 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition-all"
+        aria-label="Adicionar trilha"
+        style={{ zIndex: 50 }}
+      >
+        +
+      </button>
     </div>
   );
 };

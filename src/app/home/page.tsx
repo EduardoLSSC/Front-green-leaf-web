@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link"; // Importa o componente Link
 import Header from "@/components/personal/header";
 import TrailCard from "@/components/personal/trailCards";
 import { useSession } from "next-auth/react";
@@ -11,7 +12,6 @@ export default function Home() {
 
     useEffect(() => {
         const fetchTrails = async () => {
-            // Verifica se o token está presente
             if (session?.user?.token) {
                 try {
                     const response = await fetch('/api/trails', {
@@ -22,16 +22,12 @@ export default function Home() {
                         },
                     });
 
-                    // Verifica se a resposta da API é ok
                     if (!response.ok) {
                         throw new Error('Erro ao buscar trilhas');
                     }
 
                     const data = await response.json();
-
-                    // Ajuste aqui: não há propriedade 'data' na resposta
-                    setTrails(data); // Acessa diretamente o array de trilhas
-                    
+                    setTrails(data);
                     setLoading(false);
                 } catch (error) {
                     console.error("Erro ao buscar trilhas no frontend:", error);
@@ -45,26 +41,35 @@ export default function Home() {
         fetchTrails();
     }, [session]);
 
-    // Renderiza loading enquanto os dados estão sendo buscados
     if (loading) {
-        return <p>Carregando...</p>;
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                <p className="text-lg font-medium text-gray-600">Carregando...</p>
+            </div>
+        );
     }
 
     return (
-        <main>
-            <Header /> {/* Inclua o cabeçalho se necessário */}
-            <div className="flex flex-row items-end">
-                <h1 className="text-5xl font-serif">Trilhas</h1>
-                <p className="pl-2">{trails.length} itens</p>
-            </div>
-            <hr className="mt-4 pt-2" />
-            <div className="overflow-auto h-[80vh] w-[70%]"> {/* Contêiner com scroll */}
-                <div className="grid grid-cols-1 gap-4 pr-4">
-                    {trails.map((trail, index) => (
-                        <TrailCard key={index} trail={trail} />
-                    ))}
+        <main className="bg-gray-50 min-h-screen">
+            <Header />
+            <div className="max-w-7xl mx-auto p-6">
+                <div className="mb-1"> {/* Reduzido espaço aqui */}
+                    <h1 className="text-4xl font-bold text-green-600">Trilhas</h1>
+                    <p className="text-gray-600">{trails.length} itens disponíveis</p>
+                </div>
+                <hr className="my-1 border-gray-300" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {trails.map((trail, index) => (
+                    <TrailCard key={index} trail={trail} />
+                ))}
                 </div>
             </div>
+            {/* Botão fixo no canto inferior direito */}
+            <Link href="/mytrails/newtrail">
+                <div className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full shadow-lg cursor-pointer transition-transform transform hover:scale-105">
+                    Adicionar Nova Trilha
+                </div>
+            </Link>
         </main>
     );
 }
