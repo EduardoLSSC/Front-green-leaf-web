@@ -26,8 +26,6 @@ export default function RootLayout({
         className="min-h-screen flex flex-col m-0 p-0"
         style={{
           fontFamily: "Poppins, sans-serif",
-          margin: 0, // Remove qualquer margem padrão
-          padding: 0, // Remove qualquer padding padrão
         }}
       >
         {/* Layout do cliente */}

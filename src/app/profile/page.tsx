@@ -3,23 +3,8 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface Trail {
-  id: string;
-  name: string;
-  difficulty: string;
-  distance: number; // Distância em metros
-  rating: number;
-  photo: string; // Caminho para a imagem da trilha
-  createdBy: User;
-  author?: string;
-}
+import Link from "next/link";
+import { Trail } from "../../interfaces/Trails";
 
 const AccountPage = () => {
   const { data: session } = useSession();
@@ -100,34 +85,33 @@ const AccountPage = () => {
           {userTrails.length > 0 ? (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {userTrails.map((trail) => (
-                <li
-                  key={trail.id}
-                  className="bg-white text-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition"
-                >
-                  {/* Imagem da trilha */}
-                  <div className="relative h-40 rounded-xl overflow-hidden mb-4">
-                    <img
-                      src={trail.photo || "/images/default-trail.jpg"} // Mostra imagem padrão se não houver foto
-                      alt={trail.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  {/* Informações da trilha */}
-                  <h4 className="text-lg font-bold text-green-700">{trail.name}</h4>
-                  <p className="text-gray-600 mt-2">
-                    <span className="font-bold">Dificuldade:</span> {trail.difficulty}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-bold">Distância:</span>{" "}
-                    {(trail.distance / 1000).toFixed(2)} km
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-bold">Avaliação:</span> {trail.rating} estrelas
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-bold">Autor:</span> {trail.author}
-                  </p>
-                </li>
+                <Link key={trail.id} href={`/trail/details/${trail.id}`} passHref>
+                  <li className="bg-white text-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition cursor-pointer">
+                    {/* Imagem da trilha */}
+                    <div className="relative h-40 rounded-xl overflow-hidden mb-4">
+                      <img
+                        src={trail.photo || "/images/default-trail.jpg"} // Mostra imagem padrão se não houver foto
+                        alt={trail.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {/* Informações da trilha */}
+                    <h4 className="text-lg font-bold text-green-700">{trail.name}</h4>
+                    <p className="text-gray-600 mt-2">
+                      <span className="font-bold">Dificuldade:</span> {trail.difficulty}
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-bold">Distância:</span>{" "}
+                      {(trail.distance / 1000).toFixed(2)} km
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-bold">Avaliação:</span> {trail.rating} estrelas
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-bold">Autor:</span> {trail.author}
+                    </p>
+                  </li>
+                </Link>
               ))}
             </ul>
           ) : (
