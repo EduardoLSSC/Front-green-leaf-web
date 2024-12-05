@@ -52,7 +52,7 @@ export default function Home() {
     return (
         <main className="bg-gray-50 min-h-screen">
             <Header />
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="max-w-7xl mx-auto p-6 mt-4">
                 <div className="mb-1"> {/* Reduzido espaço aqui */}
                     <h1 className="text-4xl font-bold text-green-600">Trilhas</h1>
                     <p className="text-gray-600">{trails.length} itens disponíveis</p>
@@ -64,12 +64,6 @@ export default function Home() {
                 ))}
                 </div>
             </div>
-            {/* Botão fixo no canto inferior direito */}
-            <Link href="/mytrails/newtrail">
-                <div className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full shadow-lg cursor-pointer transition-transform transform hover:scale-105">
-                    Adicionar Nova Trilha
-                </div>
-            </Link>
         </main>
     );
 }

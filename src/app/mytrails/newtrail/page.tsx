@@ -233,14 +233,14 @@ const AddTrailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 flex flex-col relative">
+    <div className="mt-10 min-h-screen bg-white text-gray-800 flex flex-col relative">
       {showSuccessMessage && (
         <div className="absolute top-0 left-0 right-0 bg-green-600 text-white text-center py-2 z-50 shadow-md">
           Atividade salva com sucesso!
         </div>
       )}
       {/* Topo da página */}
-      <div className="w-full bg-green-700 text-white flex items-center justify-between p-4 shadow-lg">
+      <div className="w-full text-green-700 flex items-center justify-between p-4 shadow-lg">
         <FontAwesomeIcon
           icon={faTimes}
           className="text-white text-xl cursor-pointer hover:text-red-500"
@@ -259,7 +259,7 @@ const AddTrailPage = () => {
         <MapContainer
           center={position}
           zoom={13}
-          className="h-64 mb-4 rounded-lg shadow-lg w-full border border-green-600"
+          className="relative z-10 h-64 mb-4 rounded-lg shadow-lg w-full border border-green-600"
         >
           <LayersControl position="topright">
             <BaseLayer checked name="OpenStreetMap">
@@ -275,31 +275,31 @@ const AddTrailPage = () => {
       )}
   
       {/* Conteúdo principal */}
-      <div className="flex flex-col items-center justify-between bg-green-100 p-4 space-y-4 flex-grow">
+      <div className="flex flex-col items-center justify-between bg-slate-50 p-4 space-y-4 flex-grow">
         {/* Se não estiver no formulário */}
         {!isFormVisible ? (
           <div className="w-full">
             {/* Métricas */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center text-gray-800 w-full">
-              <div className="border-b border-green-600 p-2 bg-green-100 rounded-lg shadow-md">
+              <div className="border-b p-2 bg-slate-50 rounded-lg shadow-md">
                 <h3 className="text-base md:text-lg">Tempo</h3>
                 <p className="text-3xl md:text-5xl font-bold">
                   {Math.floor(elapsedTime / 60)}:{("0" + (elapsedTime % 60)).slice(-2)}
                 </p>
               </div>
-              <div className="border-b border-green-600 p-2 bg-green-100 rounded-lg shadow-md">
+              <div className="border-b p-2 bg-slate-50 rounded-lg shadow-md">
                 <h3 className="text-base md:text-lg">Distância</h3>
                 <p className="text-3xl md:text-5xl font-bold">
                   {(totalDistance > 0 ? (totalDistance / 1000).toFixed(2) : "0.00")} km
                 </p>
               </div>
-              <div className="border-b border-green-600 p-2 bg-green-100 rounded-lg shadow-md">
+              <div className="border-b p-2 bg-slate-50 rounded-lg shadow-md">
                 <h3 className="text-base md:text-lg">Velocidade Média</h3>
                 <p className="text-3xl md:text-5xl font-bold">
                   {(totalDistance > 0 ? averageSpeed.toFixed(2) : "0.00")} km/h
                 </p>
               </div>
-              <div className="p-2 bg-green-100 rounded-lg shadow-md">
+              <div className="p-2 bg-slate-50 rounded-lg shadow-md">
                 <h3 className="text-base md:text-lg">Ritmo Médio</h3>
                 <p className="text-3xl md:text-5xl font-bold">{averagePace} /km</p>
               </div>
@@ -337,7 +337,7 @@ const AddTrailPage = () => {
               e.preventDefault();
               handleSave();
             }}
-            className="bg-green-100 p-4 rounded-lg shadow-lg w-full max-w-md md:max-w-lg"
+            className="bg-slate-50 p-4 rounded-lg shadow-lg w-full max-w-md md:max-w-lg"
           >
             <div className="mb-4">
               <label

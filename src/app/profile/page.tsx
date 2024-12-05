@@ -50,7 +50,7 @@ const AccountPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-700 via-green-500 to-green-400 text-white">
+    <div className="mt-4 min-h-screen bg-slate-50 text-white">
       <main className="container mx-auto px-4 py-8">
         {/* Estatísticas do usuário */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -81,7 +81,7 @@ const AccountPage = () => {
 
         {/* Trilhas do usuário */}
         <div>
-          <h3 className="text-2xl font-bold mb-4">Minhas Trilhas</h3>
+          <h3 className="text-2xl font-bold mb-4 text-green-700">Minhas Trilhas</h3>
           {userTrails.length > 0 ? (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {userTrails.map((trail) => (

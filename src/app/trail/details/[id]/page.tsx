@@ -87,25 +87,25 @@ const TrailPage = () => {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-green-700 via-green-500 to-green-400 text-white">
-        <p className="text-lg">Carregando sessão...</p>
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 text-white">
+        <p className="text-lg text-green-700">Carregando sessão...</p>
       </div>
     );
   }
 
   if (!trail) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-green-700 via-green-500 to-green-400 text-white">
-        <p className="text-lg">Carregando detalhes da trilha...</p>
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 text-white">
+        <p className="text-lg text-green-700">Carregando detalhes da trilha...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-700 via-green-500 to-green-400 text-white">
+    <div className="mt-4 min-h-screen bg-slate-50 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Nome da Trilha */}
-        <h1 className="text-4xl font-bold text-center mb-6">{trail.name}</h1>
+        <h1 className="text-4xl font-bold text-center mb-6 text-green-700">{trail.name}</h1>
 
         {/* Informações da Trilha */}
         <div className="bg-white text-gray-800 p-6 rounded-2xl shadow-xl mb-8">
@@ -129,10 +129,10 @@ const TrailPage = () => {
         {/* Mapa da Trilha */}
         {trail.path?.coordinates ? (
           <div className="mb-8 rounded-2xl overflow-hidden shadow-xl">
-            <TrailMap path={trail.path.coordinates} className="h-[400px] w-full" />
+            <TrailMap path={trail.path.coordinates} className="relative z-10 h-[400px] w-full" />
           </div>
         ) : (
-          <p className="text-center text-white">Sem dados de rota disponíveis para esta trilha.</p>
+          <p className="text-center text-green-700">Sem dados de rota disponíveis para esta trilha.</p>
         )}
 
         {/* Comentários */}

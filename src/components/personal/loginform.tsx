@@ -29,10 +29,9 @@ export default function LoginForm() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-            <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg md:max-w-md">
+            <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-2xl md:max-w-xl">
                 <div className="flex flex-col items-center">
-                    <Image src={logo} alt="Logo" className="mb-6 shadow-lg" width={300} height={300} />
-                    <h1 className="text-4xl font-bold text-green-800 mb-8 text-center">Green Leaf Trail</h1>
+                    <Image src={logo} alt="Logo" width={300} height={300} />
                 </div>
                 <form onSubmit={login} className="space-y-6 w-full">
                     <div className="flex flex-col">
@@ -68,16 +67,16 @@ export default function LoginForm() {
                         {/* Redirecionar para a página de redefinição de senha */}
                         <a 
                             onClick={() => router.push("/forgot-password")} 
-                            className="text-sm text-gray-600 hover:text-gray-800 transition duration-300 cursor-pointer"
+                            className="text-sm text-gray-600 transition duration-300 cursor-pointer hover:text-green-600"
                         >
                             Esqueceu a senha?
                         </a>
-                        <a href="#" className="text-sm text-gray-600 hover:text-gray-800 transition duration-300">Necessita de acessibilidade?</a>
+                        <a href="#" className="text-sm text-gray-600 hover:text-green-600 transition duration-300">Necessita de acessibilidade?</a>
                     </div>
                     {/* Redirecionar para a página de cadastro */}
                     <a 
                         onClick={() => router.push("/register")} 
-                        className="text-sm text-gray-600 hover:text-gray-800 transition duration-300 cursor-pointer"
+                        className="text-sm text-gray-600 hover:text-green-600 transition duration-300 cursor-pointer"
                     >
                         Cadastrar
                     </a>

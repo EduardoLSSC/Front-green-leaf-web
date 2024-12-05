@@ -52,11 +52,11 @@ const MyTrailsPage = () => {
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-700 via-green-500 to-green-400 text-white">
+    <div className="mt-4 min-h-screen text-white bg-slate-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <header className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold">Minhas Trilhas</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-green-700">Minhas Trilhas</h1>
         </header>
 
         {/* Loading ou Trilhas */}

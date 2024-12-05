@@ -3,7 +3,19 @@ import { useState } from "react";
 import Link from "next/link";
 import LogoutButton from "./logoutbutton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+
 import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { signOut } from "next-auth/react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,19 +62,30 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/profile" className="block text-center hover:text-yellow-300 transition-all duration-300">
-                Perfil
-              </Link>
-            </li>
-            <li>
               <Link href="/mytrails" className="block text-center bg-yellow-400 text-green-900 px-4 py-2 rounded-full hover:bg-yellow-300 hover:scale-105 transition-all duration-300">
-                Trilhas
+                Minhas Trilhas
               </Link>
             </li>
             <li>
-              <div className="flex justify-center">
-                <LogoutButton />
-              </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-slate-100">
+                <DropdownMenuItem>
+                  <Link href="/profile" className="hover:text-green-600">
+                    Perfil
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })} className="cursor-pointer hover:text-green-600">
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             </li>
           </ul>
         </nav>
